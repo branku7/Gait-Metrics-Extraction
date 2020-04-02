@@ -8,6 +8,12 @@ verify_ssl = true
 [packages]
 numpy = "*"
 matplotlib = "*"
+pylint = "*"
+scipy = "*"
+datetime = "*"
+pandas = "*"
+pywavelets = "*"
+peakutils = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,1 +1,6 @@
-/data
+/data/profiles/*
+/data/tug/*
+/data/walk/*
+/scripts/detection_ic_fc.py
+scripts/__pycache__
+.vscode
