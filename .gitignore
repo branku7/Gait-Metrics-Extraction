@@ -1,7 +1,6 @@
 /data/profiles/*
 /data/tug/*
 /data/walk/*
-/scripts/visualization.py
 scripts/__pycache__
 .vscode
 main.py
