@@ -1,6 +1,4 @@
 from scipy import signal
-from scipy import integrate
-from scipy import constants
 import numpy as np
 import pandas as pd
 
@@ -12,7 +10,7 @@ def H_V_orth_sys(data,flip=False):
     # In case the AX3 is used upside down
 
     if flip:
-        data.loc[:,1:3] = -data[1:3]
+        data.loc[:,1:3] = -data.loc[:,1:3]
 
     # Get the tilted angles
 
@@ -38,13 +36,13 @@ def H_V_orth_sys(data,flip=False):
     timeseries_df = pd.DataFrame(new_time_series)
     return timeseries_df
 
-def detrend_data(*args):
+def detrend_data(data):
     """
     This function uses the signal scipy function to detrend the various 1-dim arrays contained in our dataset. It applies to the x,y,z axis of the accelerometer
     """
-    for array in args:
-        array = signal.detrend(array)
-    return None
+    for i in range(1,4):
+        data[i] = signal.detrend(data[i])
+    return data
 
 def butter_bandpass(cut, fs, order, btype):
     """
@@ -67,19 +65,10 @@ def butter_bandpass_filter(data, cut, fs, order = 4, btype = 'low'):
     y = signal.filtfilt(b, a, data)
     return y
 
-def butter_bp_data(*args,lower_than,fs,order,btype):
+def butter_bp_data(data,lower_than,fs,order,btype):
     """
     This function applies the bandpass to a dataset with 4 dimensions, supposing that the 1st is the time dimension.
     """
-    for array in args:
-        array = butter_bandpass_filter(array, lower_than, fs, order, btype)
-    return None
-
-def integrate_Hz(data,Hz = 100, change_unit = False):
-    """
-    This function uses integrate package to integrate through cummulative trapezoids over the dataset period.
-    Hz is the unit of time that we want to integrate over, change_unit is in case we want to change from g to m/s**2
-    """
-    if change_unit:
-        data = np.multiply(data,constants.g)
-    return integrate.cumtrapz(data,np.array(range(len(data)))/Hz, initial=0)
+    for i in range(1,4):
+        data[i] = butter_bandpass_filter(data[i], lower_than, fs, order, btype)
+    return data
