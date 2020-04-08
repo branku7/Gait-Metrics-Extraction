@@ -7,3 +7,5 @@ main.py
 *.ipynb
 Pipfile
 Pipfile.lock
+reports/data/*.json
+reports/file-map/*
