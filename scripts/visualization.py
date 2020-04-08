@@ -10,7 +10,7 @@ def normalize(dg):
     return (dg - np.average(dg)) / np.std(dg)
 
 
-def visualize_signal(legend, title, *args, **kwargs):
+def visualize_signal(legend, title, *args, ylabel = "m/s (normalized)", **kwargs):
     """
     Function to visualize the IC and FC detection
     both before and after optimization.
@@ -30,6 +30,6 @@ def visualize_signal(legend, title, *args, **kwargs):
         elif event == "IC":
             plt.plot(values[0], values[1], "rx", markersize=10)
     plt.legend(legend)
-    plt.ylabel("m/s (normalized)")
+    plt.ylabel(ylabel)
     plt.xlabel("0.01 seconds")
     plt.title(title)
