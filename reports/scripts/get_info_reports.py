@@ -25,7 +25,7 @@ def getReportStepsFromCsv(filename):
     exercise_name = exercise_name.lower()
 
     # Get file name without the name of exercise at the end
-    allFileSeg = aux[0] + "".join("_" + str(e) for e in aux[0:-1])
+    allFileSeg = aux[0] + "".join("_" + str(e) for e in aux[1:-1])
     
     # Get Report Code and Original Name
     report_code, original_data_filename = get_FileCode_and_Name(allFileSeg)
@@ -100,7 +100,7 @@ def get_JsonData(report_code, location = './reports/data/'):
     return json_data
 
 
-def get_FileCode_and_Name(filename, FileInfo_dir = './reports/file-map/inputFileInfo'):
+def get_FileCode_and_Name(filename, FileInfo_dir = './reports/file-map/inputFileInfo.csv'):
     # Get file with all the corresponding codes
     mapFileInfo = getFileInfo(FileInfo_dir)
     

@@ -9,3 +9,4 @@ Pipfile
 Pipfile.lock
 reports/data/*.json
 reports/file-map/*
+reports/scripts/__pycache__
