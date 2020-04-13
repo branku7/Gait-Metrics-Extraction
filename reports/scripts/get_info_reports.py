@@ -33,7 +33,7 @@ def getReportStepsFromCsv(
     allFileSeg = aux[0] + "".join("_" + str(e) for e in aux[1:-1])
 
     # Get Report Code and Original Name
-    report_code, original_data_filename = get_FileCode_and_Name(
+    report_code, original_data_filename, _ = get_FileCode_and_Name(
         allFileSeg, FileInfo_dir=dir_fileinfo
     )
 
@@ -48,7 +48,7 @@ def getReportStepsFromCsv(
 
     # S2S
     if exercise_name == "s2s":
-        print("TODO")  # TODO No steps here though
+        print("To be Developed")  # TODO No steps here though
         return [0, 0, 0]
 
     # Walk
@@ -81,7 +81,7 @@ def getReportStepsFromCsv(
 
     # Tug
     if exercise_name == "tug":
-        print("TODO")  # TODO Some steps, but is it worth it?
+        print("To be Developed")  # TODO Some steps, but is it worth it?
         return [0, 0, 0]
 
     return result
@@ -119,5 +119,58 @@ def get_FileCode_and_Name(
     fileInfo = mapFileInfo[filename]
     original_data_filename = fileInfo["filename"]
     report_code = fileInfo["code"]
+    patient_name = fileInfo["name"]
 
-    return report_code, original_data_filename
+    return report_code, original_data_filename, patient_name
+
+
+def getPatientInfo(
+    filename,
+    location_jsons="./reports/data/",
+    dir_fileinfo="./reports/file-map/inputFileInfo.csv",
+    ): 
+    """
+    This function will get the corresponding steps for the exercise
+    indetified at the end of the filename i.e. "_walk"
+
+    Important for the data to be organized in the same way.
+    """
+    # Get exercise name
+    aux = filename.split("_")
+    exercise_name = aux[-1].split(".")[0]
+    exercise_name = exercise_name.lower()
+
+    # Get file name without the name of exercise at the end
+    allFileSeg = aux[0] + "".join("_" + str(e) for e in aux[1:-1])
+
+    # Get Report Code and Original Name
+    report_code, original_data_filename, patient_name = get_FileCode_and_Name(
+        allFileSeg, FileInfo_dir=dir_fileinfo
+    )
+
+    # Get Json Data and AndroidKey
+    json_data = get_JsonData(report_code, location=location_jsons)
+    curr_android_key = get_AndroidKey(json_data, original_data_filename)
+
+    meta_data = json_data.get('AndroidReport').get(curr_android_key).get('metadata')
+        
+    patient_age = meta_data.get('age')
+    if(patient_age == 0 or patient_age == None ):
+        patient_age = json_data.get('age')
+    
+    patient_height = meta_data.get('height')
+    if(patient_height == 0 or patient_height == None):
+        patient_height = json_data.get('height')
+    
+    patient_weight = meta_data.get('weight')
+    if(patient_weight == 0 or patient_weight == None):
+        patient_weight = json_data.get('weight')
+    
+    patient_info = dict()
+    patient_info['name'] = patient_name
+    patient_info['age'] = patient_age
+    patient_info['height'] = patient_height
+    patient_info['weight'] = patient_weight
+    patient_info['code'] = report_code
+    
+    return patient_info
