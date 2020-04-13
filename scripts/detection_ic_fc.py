@@ -80,7 +80,7 @@ def optimize_IC_FCs(IC, FC):
     for k in range(max(len(IC), len(FC))):
         try:
             new_FC[k]
-        except: # FIXME : Refactor to avoid try except
+        except: # TODO : Refactor to avoid try except
             break
         for i in IC:
             if (i > new_FC[k]) & (i > (new_IC[k] + 25)) & (i < (new_IC[k] + 225)):
@@ -88,7 +88,7 @@ def optimize_IC_FCs(IC, FC):
                 break
         try:
             new_IC[k + 1]
-        except: # FIXME : Refactor to avoid try except
+        except: # TODO : Refactor to avoid try except
             break
         for j in FC:
             if (j > new_IC[k + 1]) & (j > (new_FC[k] + 25)) & (j < (new_FC[k] + 225)):
@@ -100,11 +100,11 @@ def optimize_IC_FCs(IC, FC):
     return new_IC, new_FC
 
 
-def identify_frequency(aV):
+def identify_frequency(aV): # TODO: Apply
     """
     This function will identify the main
     frequency that the data contains.
-    It is optimized to identify in walking
+    It is optimized to identify walking
     bouts from accelerometer' measurements.
     """
     result = 0

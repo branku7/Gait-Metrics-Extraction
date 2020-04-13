@@ -12,7 +12,7 @@ def get_time_difference(time_measured, time_start_of_walk):
 
         for example: get_time_difference(124827,"00:07:26")
 
-        It returns the value in seconds.
+        It returns the value in centiseconds.
     """
     time_measured_fixed = dt.fromtimestamp(time_measured / 100).time()
     time_object = dt.strptime(time_start_of_walk, "%H:%M:%S").time()
