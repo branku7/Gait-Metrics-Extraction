@@ -10,7 +10,13 @@ def normalize(dg):
     return (dg - np.average(dg)) / np.std(dg)
 
 
-def visualize_signal(legend, title, *args, ylabel = "m/s (normalized)", **kwargs):
+def visualize_signal(
+    legend,
+    title,
+    *args,
+    ylabel = "m/s (normalized)",
+    **kwargs
+    ):
     """
     Function to visualize the IC and FC detection
     both before and after optimization.
@@ -33,3 +39,33 @@ def visualize_signal(legend, title, *args, ylabel = "m/s (normalized)", **kwargs
     plt.ylabel(ylabel)
     plt.xlabel("0.01 seconds")
     plt.title(title)
+    plt.show()
+
+
+def showCharts(
+    ranges,
+    data_std,
+    data_mean,
+    mean_threshold,
+    ssd_threshold,
+    ):
+
+    Ln = len(data_std)
+    xAxis = np.arange(Ln)
+ 
+    plt.figure()
+    plt.title('Walking Bouts over Mean/SSD')
+    plt.scatter(xAxis,data_mean,s=0.7,label = 'Mean', color = "blue")
+    plt.scatter(xAxis,data_std,s=0.7,label = 'SSD', color = "orange")
+    plt.axhline(y = mean_threshold, label = 'Mean Threshold',color ='black')
+    plt.axhline(y = -mean_threshold, label = 'Mean Threshold',color ='black')
+    plt.axhline(y = ssd_threshold, label = 'SSD Threshold', color='red')
+
+    for pair in ranges:
+        if(pair == ranges[-1]):
+            plt.axvspan(pair[0], pair[1], facecolor='0.05', alpha = 0.2, zorder=-100,label = 'Walking bout')
+        else:
+            plt.axvspan(pair[0], pair[1], facecolor='0.05', alpha = 0.2, zorder=-100)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
