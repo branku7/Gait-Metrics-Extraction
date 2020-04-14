@@ -23,12 +23,13 @@ def runWalkingBoutDetection(
     data,
     mean_threshold = 0.05,
     ssd_threshold = 0.1,
-    windowSize = 10
+    windowSize = 10,
+    minimum = 50,
     ):
 
     print ("started window")
     df1, df2 = comb_std_rolling(data, windowSize) #ssd and mean av
-    ranges_ww = calcSegments(df1, df2, mean_threshold,ssd_threshold)
+    ranges_ww = calcSegments(df1, df2, mean_threshold,ssd_threshold, minimum)
     showCharts(ranges_ww, df1, df2, mean_threshold, ssd_threshold)
     return ranges_ww
 
@@ -37,7 +38,8 @@ def calcSegments(
     data_std,
     data_mean,
     mean_threshold,
-    ssd_threshold
+    ssd_threshold,
+    minimum = 250,
     ):
 
     """
@@ -76,9 +78,9 @@ def calcSegments(
 
     for i in range(0,len(ranges)):
         start = ranges[i][0]
-        end = ranges[i][1]
+        end = ranges[i][1]+1
         len_wb = end - start
-        if (len_wb < 50):
+        if (len_wb < minimum):
             walking_window[start:end] = [0]*len_wb
 
     ranges = list()

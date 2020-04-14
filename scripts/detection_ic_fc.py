@@ -1,6 +1,7 @@
 from scipy.signal import find_peaks
 from scipy import constants
 from scipy import integrate
+from matplotlib import pyplot as plt
 import peakutils
 import pywt
 import numpy as np
@@ -83,7 +84,7 @@ def optimize_IC_FCs(IC, FC):
         except: # TODO : Refactor to avoid try except
             break
         for i in IC:
-            if (i > new_FC[k]) & (i > (new_IC[k] + 25)) & (i < (new_IC[k] + 225)):
+            if (i > new_FC[k]): # & (i > (new_IC[k] + 25)) & (i < (new_IC[k] + 225)):
                 new_IC.append(i)
                 break
         try:
@@ -91,7 +92,7 @@ def optimize_IC_FCs(IC, FC):
         except: # TODO : Refactor to avoid try except
             break
         for j in FC:
-            if (j > new_IC[k + 1]) & (j > (new_FC[k] + 25)) & (j < (new_FC[k] + 225)):
+            if (j > new_IC[k + 1]): # & (j > (new_FC[k] + 25)) & (j < (new_FC[k] + 225)):
                 new_FC.append(j)
                 break
     if (len(new_IC) - 1) == (len(new_FC)):
@@ -100,43 +101,27 @@ def optimize_IC_FCs(IC, FC):
     return new_IC, new_FC
 
 
-def identify_frequency(aV): # TODO: Apply
+def identify_frequency(Vz):
     """
     This function will identify the main
     frequency that the data contains.
     It is optimized to identify walking
     bouts from accelerometer' measurements.
     """
-    result = 0
-    for cut in range(0, 300, 50):
-        if len(aV) >= cut * 2:
-            aV_identifying_frequency = aV[cut:(-1-cut)]
+    scale = list(np.arange(1, 150, 1))
+    wavelet = pywt.ContinuousWavelet("gaus2")
 
-        scale = list(np.arange(1, 150, 1))
-        wavelet = pywt.ContinuousWavelet("gaus2")
+    coefs, _ = pywt.cwt(Vz, scale, wavelet)
 
-        coefs, _ = pywt.cwt(aV_identifying_frequency, scale, wavelet)
+    averages = list()
+    for i in coefs:
+        averages.append(np.average(abs(i)))
 
-        averages = list()
-        for i in coefs:
-            averages.append(np.average(abs(i)))
+    plt.plot(scale, averages)
+    plt.title("Scale Optimization")
+    plt.show()
+    # We want to get the first peak as it should
+    # symbolize the first main frequency.
+    peaks, _ = find_peaks(averages)
 
-        # We want to get the first peak as it should
-        # symbolize the first main frequency.
-        peaks, _ = find_peaks(averages)
-
-        if len(peaks) == 0:
-            m = max(averages)
-            index = averages.index(m)
-        else:
-            index = peaks[0]
-        index
-
-        if cut == 0:
-            result = index
-
-        if (index < 30) or (index > 9):
-            result = index
-            break
-
-    return result
+    return peaks[0]

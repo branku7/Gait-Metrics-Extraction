@@ -8,7 +8,7 @@ def getFileInfo(directory):
         arrayFiles = {}
         csv_reader = csv.DictReader(csvfile)
         for row in csv_reader:
-            newFilename = row["newFilename"].split(".cwa")[0]
+            newFilename = row["filename"].split(".cwa")[0]
             arrayFiles[newFilename] = row
         return arrayFiles
 
@@ -104,7 +104,7 @@ def get_AndroidKey(json_data, original_data_filename):
 def get_JsonData(report_code, location="./reports/data/"):
     json_fid = open(
         location + report_code + ".json", "r", encoding="utf-8"
-    )  # TODO reports pode mudar
+    ) 
     json_data = json.load(json_fid)
 
     return json_data
@@ -117,7 +117,7 @@ def get_FileCode_and_Name(
     mapFileInfo = getFileInfo(FileInfo_dir)
 
     fileInfo = mapFileInfo[filename]
-    original_data_filename = fileInfo["filename"]
+    original_data_filename = fileInfo["newFilename"]
     report_code = fileInfo["code"]
     patient_name = fileInfo["name"]
 

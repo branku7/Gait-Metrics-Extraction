@@ -1,6 +1,21 @@
 import numpy as np
 
 
+def get_gait_doublesupport(IC, FC, Hz = 100):
+    """
+    Get Double Support:
+    The time that both feet were on the ground
+    """
+    Ln = len(IC)
+
+    dsupport_time = np.empty((Ln,1))
+    for i in range(Ln):
+        dsupport_time[i] = (FC[i]-IC[i]) / Hz
+    dsupport_time_avg = np.average(dsupport_time)
+
+    return dsupport_time_avg, dsupport_time
+
+
 def get_gait_stance(IC, FC, Hz = 100):
     """
     Get Stance Time: The time that a foot is in contact with
@@ -10,7 +25,7 @@ def get_gait_stance(IC, FC, Hz = 100):
     Ln = len(IC)
 
     stance_time = np.empty((Ln-1,1))
-    for i in range(len(FC)-1):
+    for i in range(Ln-1):
         stance_time[i] = (FC[i+1]-IC[i]) / Hz
     stance_time_avg = np.average(stance_time)
 
@@ -28,7 +43,7 @@ def get_gait_stride(IC, FC, Hz = 100):
     Ln = len(IC)
 
     stride_time = np.empty((Ln-2,1))
-    for i in range(len(IC)-2):
+    for i in range(Ln-2):
         stride_time[i] = (IC[i+2]-IC[i]) / Hz
     stride_time_avg = np.average(stride_time)
 
@@ -61,6 +76,18 @@ def get_gait_step(IC, Hz = 100):
     step_time_avg = np.average(step_time)
 
     return step_time_avg, step_time
+
+
+def get_gait_strideLen(stepLen):
+    """
+    Get distance walked after two steps
+    """
+    strideLen = list()
+    for i in range(len(stepLen)-1):
+        stridelen = stepLen[i] + stepLen[i+1]
+        strideLen.append(stridelen)
+    strideLen_avg = np.average(strideLen)
+    return strideLen_avg, strideLen
 
 
 def get_gait_stepLen(h, IC, patient_height):
@@ -128,4 +155,13 @@ def asymmetry(data):
     right = [data[i] for i in range(len(data)) if i%2==0] #TODO find a better way to identify left and right
     left = [data[i] for i in range(len(data)) if i%2!=0]
 
-    return abs(np.average(left)-np.average(right))   
+    return abs(np.average(left)-np.average(right))
+
+
+def get_cadence(IC):
+    """
+    We assume that ICs are in centiseconds.
+    Through the ICs we get the number of steps
+    per minute = cadence
+    """
+    return len(IC)/((IC[-1]-IC[0])/6000)

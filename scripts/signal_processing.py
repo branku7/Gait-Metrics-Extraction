@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 
-def H_V_orth_sys(data, flip=False):
+def H_V_orth_sys(data_db, flip=False):
     """
     Considers 3 axis from an accelerometer tilted.
     This function fixes the values of all axis by assuming that
@@ -11,6 +11,7 @@ def H_V_orth_sys(data, flip=False):
     In case the device is flipped upside down, flip should be turned to True.
     """
     # In case the AX3 is used upside down
+    data = data_db.copy()
 
     if flip:
         data.loc[:, 1:3] = -data.loc[:, 1:3]
