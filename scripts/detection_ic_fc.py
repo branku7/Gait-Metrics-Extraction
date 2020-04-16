@@ -101,10 +101,10 @@ def optimize_IC_FCs(IC, FC):
     return new_IC, new_FC
 
 
-def identify_frequency(Vz):
+def identify_scale(Vz, plot_this = False):
     """
     This function will identify the main
-    frequency that the data contains.
+    wave scale that the data contains.
     It is optimized to identify walking
     bouts from accelerometer' measurements.
     """
@@ -117,11 +117,16 @@ def identify_frequency(Vz):
     for i in coefs:
         averages.append(np.average(abs(i)))
 
-    plt.plot(scale, averages)
-    plt.title("Scale Optimization")
-    plt.show()
+    if plot_this:
+        plt.plot(scale, averages)
+        plt.title("Scale Optimization")
+        plt.show()
     # We want to get the first peak as it should
     # symbolize the first main frequency.
     peaks, _ = find_peaks(averages)
 
-    return peaks[0]
+    if len(peaks) == 0:
+        return max(averages)
+
+    else:
+        return peaks[0]

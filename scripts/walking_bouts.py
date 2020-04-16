@@ -3,7 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import os
 from scripts.signal_processing import butter_bp_data
-from scripts.visualization import showCharts
+from scripts.visualization import showCharts, showCharts_freq
+from scripts.detection_ic_fc import integrate_Hz, identify_scale
 
 
 def applyOffsetRemove(df):
@@ -21,24 +22,26 @@ def applyFilter(df):
 
 def runWalkingBoutDetection(
     data,
-    mean_threshold = 0.05,
     ssd_threshold = 0.1,
+    scale_threshold = [1,30],
     windowSize = 10,
     minimum = 50,
     ):
 
     print ("started window")
-    df1, df2 = comb_std_rolling(data, windowSize) #ssd and mean av
-    ranges_ww = calcSegments(df1, df2, mean_threshold,ssd_threshold, minimum)
-    showCharts(ranges_ww, df1, df2, mean_threshold, ssd_threshold)
+    df1, df3 = comb_std_rolling(data, windowSize) #ssd and mean av
+    ranges_ww = calcSegments(windowSize, df1, df3 ,ssd_threshold, scale_threshold, minimum)
+    showCharts(windowSize, ranges_ww, df1, ssd_threshold)
+    showCharts_freq(ranges_ww, df3, scale_threshold[1])
     return ranges_ww
 
 
 def calcSegments(
+    window,
     data_std,
-    data_mean,
-    mean_threshold,
+    data_scale,
     ssd_threshold,
+    scale_threshold,
     minimum = 250,
     ):
 
@@ -46,17 +49,16 @@ def calcSegments(
     This function provides the ranges that satisfy the
     threshold conditions.
     """
-    Ln = len(data_std)
+    Ln = len(data_scale)
     walking_window = np.zeros(Ln)
     ranges = list()
     start = 0
     end = 0
     contiguous = False
-
     # Mark the ranges that satisfy a certain condition
     for i in range(0,Ln):
-        if (data_std[i] >= ssd_threshold and \
-        (data_mean[i] >= mean_threshold or data_mean[i] <= -mean_threshold )):
+        if (data_std[window+i] >= ssd_threshold) and \
+            (data_scale[i] >= scale_threshold[0] and data_scale[i] < scale_threshold[1]):
             walking_window[i] = 1
 
 
@@ -119,8 +121,13 @@ def comb_std_rolling (data, window):
     data_combined = arr.sum(axis = 0)
     data_combined = data_combined[window-1:len(data_combined)]
 
-    # data[1] for vertical, data[3] for posterior, data[2] for mediolateral
-    data_mean = data[3].rolling(window).mean()
-    data_mean = data_mean[window-1:len(data_mean)].tolist()
+    # Identify Scale
+    Vz = integrate_Hz(data[1])
+    Vz = pd.DataFrame(Vz)
+    data_scale = Vz[0].rolling(window*2).apply(
+                    identify_scale,
+                    raw=True
+                    )
+    data_scale = data_scale[window*2-1:len(data_scale)].tolist()
 
-    return data_combined, data_mean
+    return data_combined, data_scale
