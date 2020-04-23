@@ -23,25 +23,21 @@ def applyFilter(df):
 def runWalkingBoutDetection(
     data,
     ssd_threshold = 0.1,
-    scale_threshold = [1,30],
     windowSize = 10,
     minimum = 50,
     ):
 
     print ("started window")
-    df1, df3 = comb_std_rolling(data, windowSize) #ssd and mean av
-    ranges_ww = calcSegments(windowSize, df1, df3 ,ssd_threshold, scale_threshold, minimum)
+    df1 = comb_std_rolling(data, windowSize)
+    ranges_ww = calcSegments(windowSize, df1 ,ssd_threshold, minimum)
     showCharts(windowSize, ranges_ww, df1, ssd_threshold)
-    showCharts_freq(ranges_ww, df3, scale_threshold[1])
     return ranges_ww
 
 
 def calcSegments(
     window,
     data_std,
-    data_scale,
     ssd_threshold,
-    scale_threshold,
     minimum = 250,
     ):
 
@@ -49,7 +45,7 @@ def calcSegments(
     This function provides the ranges that satisfy the
     threshold conditions.
     """
-    Ln = len(data_scale)
+    Ln = len(data_std)
     walking_window = np.zeros(Ln)
     ranges = list()
     start = 0
@@ -57,8 +53,7 @@ def calcSegments(
     contiguous = False
     # Mark the ranges that satisfy a certain condition
     for i in range(0,Ln):
-        if (data_std[window+i] >= ssd_threshold) and \
-            (data_scale[i] >= scale_threshold[0] and data_scale[i] < scale_threshold[1]):
+        if (data_std[i] >= ssd_threshold):
             walking_window[i] = 1
 
 
@@ -106,7 +101,7 @@ def calcSegments(
 
 def comb_std_rolling (data, window):
     """
-    This function will perform a rolling window for combined std and mean value
+    This function will perform a rolling window for combined std
     of several axis.
     """
 
@@ -121,13 +116,4 @@ def comb_std_rolling (data, window):
     data_combined = arr.sum(axis = 0)
     data_combined = data_combined[window-1:len(data_combined)]
 
-    # Identify Scale
-    Vz = integrate_Hz(data[1])
-    Vz = pd.DataFrame(Vz)
-    data_scale = Vz[0].rolling(window*2).apply(
-                    identify_scale,
-                    raw=True
-                    )
-    data_scale = data_scale[window*2-1:len(data_scale)].tolist()
-
-    return data_combined, data_scale
+    return data_combined
